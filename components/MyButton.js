@@ -13,7 +13,7 @@ const MyButton = ({ color, text, testProp2, passedFunc }) => {
         <Text
           // adjustsFontSizeToFit={true}
           // numberOfLines={2}
-          style={{ color: "white" }}
+          style={{ color: "white", textAlign: "center" }}
         >
           {text}
         </Text>
@@ -29,12 +29,13 @@ const styles = (color) => {
     btn: {
       backgroundColor: color,
       minWidth: 20,
-      maxWidth: 200,
+      maxWidth: 150,
       minHeight: 25,
       borderRadius: 10,
       marginHorizontal: 3,
       paddingHorizontal: 10,
       paddingVertical: 2,
+      // flexWrap: "wrap",
       // display: "flex",
       // alignItems: "center",
       margin: 10,

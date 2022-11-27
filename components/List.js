@@ -18,9 +18,10 @@ export const List = ({ navigation }) => {
   const [locationsArr, setLocationsArr] = useState([]);
   const [errorMsg, setErrorMsg] = useState(null);
   const [pickedLocations, setPickedLocations] = useState([]);
+  const [isEnabled, setIsEnabled] = useState(false);
 
   const navigateToMap = () => {
-    navigation.navigate("Map");
+    navigation.navigate("Map", { pickedLocations: pickedLocations });
   };
 
   const getLocation = () => {
@@ -64,6 +65,11 @@ export const List = ({ navigation }) => {
     alert("Dane zostały usunięte");
   };
 
+  const toggleSwitch = () => {
+    setIsEnabled(!isEnabled);
+  };
+  useEffect(() => console.log(pickedLocations), [pickedLocations]);
+
   return (
     <View style={styles.container}>
       <View style={styles.btnSpace}>
@@ -82,7 +88,7 @@ export const List = ({ navigation }) => {
           color="#265e07"
           passedFunc={navigateToMap}
         ></MyButton>
-        <Switch></Switch>
+        <Switch onValueChange={toggleSwitch} value={isEnabled}></Switch>
       </View>
       <View style={styles.userList}>
         {/* {locationFetching ? (
@@ -97,6 +103,7 @@ export const List = ({ navigation }) => {
               date={item.timestamp}
               pickedLocations={pickedLocations}
               setPickedLocations={setPickedLocations}
+              isAllEnabled={isEnabled}
             ></ListItem>
           )}
         ></FlatList>

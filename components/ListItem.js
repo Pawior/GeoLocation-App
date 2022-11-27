@@ -7,26 +7,40 @@ export const ListItem = ({
   long,
   pickedLocations,
   setPickedLocations,
+  isAllEnabled,
 }) => {
   const [isEnabled, setIsEnabled] = useState(false);
-  useEffect(() => {
-    console.log(isEnabled);
+  const addToArray = async () => {
     if (isEnabled) {
-      setPickedLocations([
-        ...pickedLocations,
+      setPickedLocations((prevArray) => [
+        ...prevArray,
         { timestamp: date, lat: lat, long: long },
       ]);
-    } else {
-      setPickedLocations(
-        pickedLocations.filter((location) => location.timestamp != date)
-      );
     }
-    console.log(pickedLocations);
+    if (isEnabled == false) {
+      // setPickedLocations(
+      //   pickedLocations.filter((location) => location.timestamp != date)
+      // );
+      setPickedLocations((prevArray) => {
+        return [...prevArray.filter((location) => location.timestamp != date)];
+      });
+    }
+  };
+  useEffect(() => {
+    console.log("kilkam " + date);
+    console.log(isEnabled);
+    addToArray();
+    // console.log(pickedLocations);
   }, [isEnabled]);
-  useEffect(() => console.log(pickedLocations), [pickedLocations]);
-
+  // useEffect(() => console.log(pickedLocations), [pickedLocations]);
+  useEffect(() => {
+    if (isAllEnabled) {
+      setIsEnabled(true);
+    } else if (isAllEnabled == false) setIsEnabled(false);
+  }, [isAllEnabled]);
   const toggleSwitch = async () => {
     await setIsEnabled((previousState) => !previousState);
+    // console.log("toggluje");
     // if (isEnabled) {
     //   setPickedLocations([
     //     ...pickedLocations,

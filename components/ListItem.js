@@ -1,5 +1,6 @@
 import { StyleSheet, Text, View, Switch, Image } from "react-native";
 import React, { useState, useEffect } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export const ListItem = ({
   date,
@@ -10,6 +11,23 @@ export const ListItem = ({
   isAllEnabled,
 }) => {
   const [isEnabled, setIsEnabled] = useState(false);
+
+  const setData = async () => {
+    let objToStore = { timestamp: date, lat: lat, long: long };
+    const jsonObj = JSON.stringify(objToStore);
+    await AsyncStorage.setItem(`key${date}`, jsonObj);
+    // console.log(item);
+    // await AsyncStorage.setItem(
+    //   "key",
+    //   toString(date),
+    //   "lat",
+    //   toString(lat),
+    //   "long",
+    //   toString(long)
+    // );
+  };
+  setData();
+
   const addToArray = async () => {
     if (isEnabled) {
       setPickedLocations((prevArray) => [
@@ -26,11 +44,18 @@ export const ListItem = ({
       });
     }
   };
+
+  const getData = async () => {
+    let val = await AsyncStorage.getItem(`key${date}`);
+    console.log("DATA");
+    console.log(val);
+  };
+
   useEffect(() => {
-    console.log("kilkam " + date);
-    console.log(isEnabled);
+    // console.log("kilkam " + date);
+    // console.log(isEnabled);
     addToArray();
-    // console.log(pickedLocations);
+    getData();
   }, [isEnabled]);
   // useEffect(() => console.log(pickedLocations), [pickedLocations]);
   useEffect(() => {

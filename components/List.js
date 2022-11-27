@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import React, { useState, useEffect } from "react";
 import * as Location from "expo-location";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import MyButton from "./MyButton";
 import ListItem from "./ListItem";
 
@@ -23,6 +24,41 @@ export const List = ({ navigation }) => {
   const navigateToMap = () => {
     navigation.navigate("Map", { pickedLocations: pickedLocations });
   };
+
+  const retrieveStorageData = () => {
+    const getAllData = async () => {
+      let keys = await AsyncStorage.getAllKeys();
+      console.log("keys", keys);
+      let stores = await AsyncStorage.multiGet(keys);
+      console.log("stores", stores);
+      let tempObj = {};
+      let maps = stores.map((result, i, store) => {
+        let key = store[i][0];
+        let value = JSON.parse(store[i][1]);
+        tempObj[`${key}`] = value;
+        console.log(key, value);
+        // if (Object.keys(tempObj).length == 3) {
+        //   setLocationsArr([...locationsArr, tempObj]);
+        //   Object.keys(tempObj).forEach((key) => {
+        //     delete tempObj[key];
+        //   });
+        // }
+        // setLocationsArr([...locationsArr, value]);
+        setLocationsArr((prevArray) => [...prevArray, value]);
+        // let objToState = {};
+      });
+    };
+    getAllData();
+  };
+
+  useEffect(() => {
+    retrieveStorageData();
+  }, []);
+
+  useEffect(() => {
+    console.log("moja loc arra");
+    console.log(locationsArr);
+  }, [locationsArr]);
 
   const getLocation = () => {
     setLocationFetching(true);
@@ -50,7 +86,14 @@ export const List = ({ navigation }) => {
           onPress: () => {
             console.log("OK Pressed");
             setLocation(location);
-            setLocationsArr([...locationsArr, location]);
+            setLocationsArr([
+              ...locationsArr,
+              {
+                timestamp: location.timestamp,
+                lat: location.coords.latitude,
+                long: location.coords.longitude,
+              },
+            ]);
           },
         },
       ]);
@@ -59,16 +102,37 @@ export const List = ({ navigation }) => {
       console.log(location);
     })();
   };
+  const clearAll = async () => {
+    try {
+      await AsyncStorage.clear();
+    } catch (e) {
+      // clear error
+    }
+
+    console.log("Done.");
+  };
   const clearLocationData = () => {
     setLocationsArr([]);
     setPickedLocations([]);
     alert("Dane zostały usunięte");
+    clearAll();
   };
 
   const toggleSwitch = () => {
     setIsEnabled(!isEnabled);
   };
-  useEffect(() => console.log(pickedLocations), [pickedLocations]);
+
+  const getData = async () => {
+    let val = await AsyncStorage.getItem("key");
+    console.log(val);
+  };
+  useEffect(() => {
+    // console.log(pickedLocations);
+    // if (pickedLocations.length > 0) {
+    //   setData(pickedLocations[pickedLocations.length - 1]);
+    // }
+    // getData();
+  }, [pickedLocations]);
 
   return (
     <View style={styles.container}>
@@ -98,8 +162,8 @@ export const List = ({ navigation }) => {
           data={locationsArr}
           renderItem={({ item }) => (
             <ListItem
-              lat={item.coords.latitude}
-              long={item.coords.longitude}
+              lat={item.lat}
+              long={item.long}
               date={item.timestamp}
               pickedLocations={pickedLocations}
               setPickedLocations={setPickedLocations}
